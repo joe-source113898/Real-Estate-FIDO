@@ -258,14 +258,11 @@ footer .social-icons a:hover {
     /* Hero Section Adjustments */
     .hero-section {
         padding: 3rem 1rem;
+        text-align: center;
     }
 
     .hero-section h1 {
         font-size: 2rem;
-        text-align: center;
-        word-wrap: break-word;
-        line-height: 1.2;
-        margin: 0 1rem;
     }
 
     .hero-section p {
@@ -280,6 +277,12 @@ footer .social-icons a:hover {
     .hero-logo {
         width: 200px;
         margin-top: 0.5rem;
+    }
+
+    /* Agents Section Adjustments */
+    .agent-card {
+        width: 90%;
+        margin: 1rem auto;
     }
 
     /* Navbar Adjustments */
