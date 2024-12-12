@@ -1,0 +1,264 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1d3557, #457b9d, #a8dadc);
+    background-size: 400% 400%;
+    animation: gradientAnimation 15s ease infinite;
+    color: white;
+    padding: 5rem 0;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.hero-section .btn {
+    background-color: white;
+    color: #1d3557;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section .btn:hover {
+    background-color: #457b9d;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+/* Hero Section Logo */
+.hero-logo {
+    width: 300px; /* Adjust the size of the logo */
+    height: auto; /* Maintain the aspect ratio */
+    margin-top: 1rem; /* Add some spacing */
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* Subtle shadow effect */
+}
+
+/* Gradient Animation */
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+h1, h2 {
+    font-weight: bold;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #003566; /* Dark blue background for navbar */
+    border-bottom: 4px solid #00b4d8; /* Bright blue bottom border */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00b4d8; /* Bright blue for the brand */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-brand:hover {
+    color: #0077b6; /* Slightly darker blue on hover */
+    text-decoration: none;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff; /* White links */
+    font-weight: bold;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #00b4d8; /* Bright blue on hover */
+    background-color: rgba(0, 180, 216, 0.2); /* Light blue background on hover */
+    border-radius: 5px;
+}
+
+.navbar-toggler {
+    background-color: #00b4d8; /* Bright blue for the toggler button */
+    border: none;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* Section Spacing */
+section {
+    padding: 2rem 0;
+}
+
+/* Carousel Styling */
+.carousel-inner {
+    padding: 1rem 0;
+}
+
+.carousel-item {
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+/* Agents Section */
+.agent-card {
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.agent-card:hover {
+    transform: translateY(-10px); /* Lift on hover */
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.agent-card .qr-code {
+    margin-top: 1rem;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.agent-card h5 {
+    font-weight: bold;
+    color: #333;
+}
+
+.agent-card p {
+    color: #555;
+    font-size: 1.2rem;
+}
+
+.agent-card .btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 25px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.agent-card .btn:hover {
+    background-color: #457b9d;
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Carousel Navigation */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+}
+
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+    background-color: #1d3557;
+}
+
+/* Service Item Card */
+.service-item {
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f8f9fa; /* Light background for the card */
+    padding: 1rem;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.service-item:hover {
+    transform: translateY(-10px); /* Lift card on hover */
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+    background-color: #e8f0ff; /* Subtle blue background on hover */
+}
+
+/* Service Item Image */
+.service-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-item:hover .service-image {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.service-item h3 {
+    margin-top: 0.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.service-item p {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    background-color: #003566; /* Dark blue background for footer */
+    color: #ffffff; /* White text */
+    padding: 2rem 0; /* Inner spacing */
+    border-top: 4px solid #00b4d8; /* Bright blue top border */
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle text shadow */
+}
+
+footer a {
+    color: #00b4d8; /* Bright blue links */
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #0077b6; /* Darker blue on hover */
+    text-decoration: underline;
+}
+
+footer .social-icons {
+    margin-top: 1rem;
+}
+
+footer .social-icons a {
+    color: #00b4d8; /* Bright blue for social icons */
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+footer .social-icons a:hover {
+    color: #0077b6; /* Darker blue on hover */
+    transform: scale(1.2); /* Zoom effect on hover */
+}
