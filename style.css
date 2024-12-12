@@ -61,10 +61,6 @@ body {
     }
 }
 
-h1, h2 {
-    font-weight: bold;
-}
-
 /* Navbar */
 .navbar {
     background-color: #003566; /* Dark blue background for navbar */
@@ -164,18 +160,6 @@ section {
     transform: scale(1.05); /* Slight zoom on hover */
 }
 
-/* Carousel Navigation */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-}
-
-.carousel-control-prev-icon:hover,
-.carousel-control-next-icon:hover {
-    background-color: #1d3557;
-}
-
 /* Service Item Card */
 .service-item {
     border-radius: 10px;
@@ -261,4 +245,53 @@ footer .social-icons a {
 footer .social-icons a:hover {
     color: #0077b6; /* Darker blue on hover */
     transform: scale(1.2); /* Zoom effect on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    /* General Adjustments for Mobile */
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* Hero Section Adjustments */
+    .hero-section {
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .hero-section .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .hero-logo {
+        width: 200px;
+        margin-top: 0.5rem;
+    }
+
+    /* Agents Section Adjustments */
+    .agent-card {
+        width: 90%;
+        margin: 1rem auto;
+    }
+
+    /* Navbar Adjustments */
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 0.5rem 0;
+    }
 }
