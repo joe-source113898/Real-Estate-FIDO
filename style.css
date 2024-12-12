@@ -72,23 +72,14 @@ body {
     font-weight: bold;
     color: #00b4d8; /* Bright blue for the brand */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    white-space: nowrap; /* Prevents text from breaking into multiple lines */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." if the text overflows */
 }
 
 .navbar-brand:hover {
     color: #0077b6; /* Slightly darker blue on hover */
     text-decoration: none;
-}
-
-.navbar-nav .nav-link {
-    color: #ffffff; /* White links */
-    font-weight: bold;
-    transition: color 0.3s ease, background-color 0.3s ease;
-}
-
-.navbar-nav .nav-link:hover {
-    color: #00b4d8; /* Bright blue on hover */
-    background-color: rgba(0, 180, 216, 0.2); /* Light blue background on hover */
-    border-radius: 5px;
 }
 
 .navbar-toggler {
@@ -286,12 +277,26 @@ footer .social-icons a:hover {
     }
 
     /* Navbar Adjustments */
-    nav ul {
-        flex-direction: column;
-        align-items: center;
+     .navbar-brand {
+        font-size: 1rem; /* Reduce font size for mobile */
+        text-align: center;
     }
 
-    nav ul li {
-        margin: 0.5rem 0;
+    .navbar-brand img {
+        width: 30px; /* Reduce logo size for mobile */
+        height: 30px;
+        margin-right: 0.5rem;
+    }
+
+    .navbar {
+        padding: 0.5rem 1rem; /* Reduce padding for smaller screens */
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .nav-item {
+        margin-bottom: 0.5rem;
     }
 }
