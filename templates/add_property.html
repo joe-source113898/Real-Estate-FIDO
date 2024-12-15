@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Añadir Propiedad{% endblock %}
+{% block content %}
+<h1>Añadir Propiedad</h1>
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="name">Título</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="price">Precio</label>
+        <input type="number" name="price" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="operation">Tipo de Operación (Venta/Renta)</label>
+        <select name="operation" class="form-control" required>
+            <option value="venta">Venta</option>
+            <option value="renta">Renta</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="type">Tipo de Propiedad (Casa/Departamento/Local/Terreno)</label>
+        <select name="type" class="form-control" required>
+            <option value="casa">Casa</option>
+            <option value="departamento">Departamento</option>
+            <option value="local">Local</option>
+            <option value="terreno">Terreno</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="bedrooms">Recámaras</label>
+        <input type="number" name="bedrooms" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="bathrooms">Baños</label>
+        <input type="number" name="bathrooms" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="parking_spaces">Estacionamientos</label>
+        <input type="number" name="parking_spaces" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="area">Área</label>
+        <input type="number" name="area" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="colony">Colonia</label>
+        <input type="text" name="colony" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="municipality">Municipio</label>
+        <input type="text" name="municipality" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="images">Imágenes</label>
+        <input type="file" name="images" multiple class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+{% endblock %}

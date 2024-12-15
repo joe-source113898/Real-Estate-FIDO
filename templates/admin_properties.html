@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Administrar Propiedades{% endblock %}
+{% block content %}
+<h1>Administrar Propiedades</h1>
+<a href="{{ url_for('add_property') }}" class="btn btn-primary mb-3">Añadir Propiedad</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Operación</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for property in properties %}
+        <tr>
+            <td>{{ property[1] }}</td>
+            <td>{{ property[2] }}</td>
+            <td>{{ property[3] }}</td>
+            <td>{{ property[4] }}</td>
+            <td>
+                <a href="{{ url_for('edit_property', property_id=property[0]) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form action="{{ url_for('delete_property', property_id=property[0]) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

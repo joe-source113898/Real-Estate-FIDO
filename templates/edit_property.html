@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Editar Propiedad{% endblock %}
+{% block content %}
+<h1>Editar Propiedad</h1>
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="name">Nombre</label>
+        <input type="text" name="name" class="form-control" value="{{ property[1] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="price">Precio</label>
+        <input type="number" name="price" class="form-control" value="{{ property[2] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="operation">Operación</label>
+        <select name="operation" class="form-control" required>
+            <option value="venta" {% if property[3] == 'venta' %}selected{% endif %}>Venta</option>
+            <option value="renta" {% if property[3] == 'renta' %}selected{% endif %}>Renta</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="type">Tipo</label>
+        <select name="type" class="form-control" required>
+            <option value="casa" {% if property[4] == 'casa' %}selected{% endif %}>Casa</option>
+            <option value="departamento" {% if property[4] == 'departamento' %}selected{% endif %}>Departamento</option>
+            <option value="local" {% if property[4] == 'local' %}selected{% endif %}>Local</option>
+            <option value="terreno" {% if property[4] == 'terreno' %}selected{% endif %}>Terreno</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="bedrooms">Recámaras</label>
+        <input type="number" name="bedrooms" class="form-control" value="{{ property[5] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="bathrooms">Baños</label>
+        <input type="number" name="bathrooms" class="form-control" value="{{ property[6] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="parking_spaces">Estacionamientos</label>
+        <input type="number" name="parking_spaces" class="form-control" value="{{ property[7] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="area">Área</label>
+        <input type="number" name="area" class="form-control" value="{{ property[8] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="colony">Colonia</label>
+        <input type="text" name="colony" class="form-control" value="{{ property[9] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="municipality">Municipio</label>
+        <input type="text" name="municipality" class="form-control" value="{{ property[10] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="images">Imágenes Nuevas (opcional)</label>
+        <input type="file" name="images" multiple class="form-control">
+        <small class="form-text text-muted">Imágenes actuales: {{ property[11] }}</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+{% endblock %}

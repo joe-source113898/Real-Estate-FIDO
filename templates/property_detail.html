@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ property[1] }} - Detalles{% endblock %}
+{% block content %}
+<h1>{{ property[1] }}</h1>
+<div class="row">
+    <div class="col-md-8">
+        <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in images %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                    <img src="{{ url_for('static', filename='images/properties/' + image) }}" class="d-block w-100" alt="{{ property[1] }}">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h3>Detalles</h3>
+        <ul>
+            <li><strong>Precio:</strong> ${{ "{:,}".format(property[2]) }} MXN</li>
+            <li><strong>Operación:</strong> {{ property[3] }}</li>
+            <li><strong>Tipo:</strong> {{ property[4] }}</li>
+            <li><strong>Recámaras:</strong> {{ property[5] }}</li>
+            <li><strong>Baños:</strong> {{ property[6] }}</li>
+            <li><strong>Estacionamientos:</strong> {{ property[7] }}</li>
+            <li><strong>Área:</strong> {{ property[8] }} m²</li>
+            <li><strong>Colonia:</strong> {{ property[9] }}</li>
+            <li><strong>Municipio:</strong> {{ property[10] }}</li>
+        </ul>
+    </div>
+</div>
+<div class="mt-5">
+    <a href="{{ url_for('properties') }}" class="btn btn-secondary">Volver a las Propiedades</a>
+</div>
+{% endblock %}
