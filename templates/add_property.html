@@ -40,7 +40,7 @@
         <input type="number" name="parking_spaces" class="form-control" required>
     </div>
     <div class="mb-3">
-        <label for="area">Área</label>
+        <label for="area">Área (m²)</label>
         <input type="number" name="area" class="form-control" required>
     </div>
     <div class="mb-3">
@@ -52,8 +52,9 @@
         <input type="text" name="municipality" class="form-control" required>
     </div>
     <div class="mb-3">
-        <label for="images">Imágenes</label>
-        <input type="file" name="images" multiple class="form-control">
+        <label for="images">Imágenes de la Propiedad</label>
+        <input type="file" name="images" multiple accept="image/*" class="form-control" required>
+        <small class="form-text text-muted">Puedes subir múltiples imágenes en formato JPEG, PNG o JPG.</small>
     </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
 </form>

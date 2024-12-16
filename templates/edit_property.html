@@ -40,7 +40,7 @@
         <input type="number" name="parking_spaces" class="form-control" value="{{ property[7] }}" required>
     </div>
     <div class="mb-3">
-        <label for="area">Área</label>
+        <label for="area">Área (m²)</label>
         <input type="number" name="area" class="form-control" value="{{ property[8] }}" required>
     </div>
     <div class="mb-3">
@@ -53,8 +53,18 @@
     </div>
     <div class="mb-3">
         <label for="images">Imágenes Nuevas (opcional)</label>
-        <input type="file" name="images" multiple class="form-control">
-        <small class="form-text text-muted">Imágenes actuales: {{ property[11] }}</small>
+        <input type="file" name="images" multiple accept="image/*" class="form-control">
+        <small class="form-text text-muted">Imágenes actuales:</small>
+        <div class="mt-2">
+            {% if property[11] %}
+                {% for image in property[11].split(',') %}
+                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}"
+                         alt="Imagen Actual" class="img-thumbnail me-2" style="width: 100px; height: auto;">
+                {% endfor %}
+            {% else %}
+                <p>No hay imágenes disponibles.</p>
+            {% endif %}
+        </div>
     </div>
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
 </form>

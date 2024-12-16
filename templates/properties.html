@@ -54,16 +54,26 @@
                 <div class="col-md-4">
                     <div class="card mb-4 property-item">
                         <a href="{{ url_for('property_detail', property_id=property[0]) }}">
-                            <img src="{{ url_for('static', filename='images/properties/' + property[-1].split(',')[0]) }}" class="card-img-top" alt="{{ property[1] }}">
+                            {% if property[-1] and property[-1].split(',')[0] %}
+                                <!-- Show the first image if it exists -->
+                                <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + property[-1].split(',')[0]) }}" 
+                                     class="card-img-top" alt="{{ property[1] }}">
+                            {% else %}
+                                <!-- Show a default image if there are no images -->
+                                <img src="{{ url_for('static', filename='images/default_property.png') }}" 
+                                     class="card-img-top" alt="Imagen no disponible">
+                            {% endif %}
+                            <!-- Operation Label (Sale or Rent) -->
+                            <span class="operation-badge">{{ property[3] }}</span>
                         </a>
                         <div class="card-body">
                             <h5 class="card-title">{{ property[1] }}</h5>
-                            <p class="card-text">{{ property[5] }} recámaras, {{ property[6] }} baños - ${{ "{:,}".format(property[2]) }} MXN</p>
+                            <p class="card-text">{{ property[5] }} recámaras, {{ property[6] }} baños - ${{ "{:,.0f}".format(property[2]) }} MXN</p>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
-            </div>
+            </div>            
         </div>
     </main>
 

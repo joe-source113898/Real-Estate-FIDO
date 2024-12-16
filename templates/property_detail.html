@@ -1,43 +1,187 @@
-{% extends 'base.html' %}
-{% block title %}{{ property[1] }} - Detalles{% endblock %}
-{% block content %}
-<h1>{{ property[1] }}</h1>
-<div class="row">
-    <div class="col-md-8">
-        <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ property[1] }} - Detalles</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/logo_dark_background.png') }}" alt="Logo" class="logo me-2">
+                Fuerza Inmobiliaria de Occidente
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#about">Sobre Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('agents') }}">Agentes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#services">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('properties') }}">Propiedades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contacto</a></li>
+                </ul>
+                <div class="d-flex ms-lg-3">
+                    <a href="https://facebook.com" target="_blank" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="https://twitter.com" target="_blank" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="text-white"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Property Header -->
+    <div class="property-header" style="background: url('{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + images[0]) }}') center/cover no-repeat;">
+        <div class="overlay">
+            <h1>{{ property[1] }}</h1>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Details Section -->
+            <div class="col-md-8">
+                <div class="details-section">
+                    <h3>Detalles de la Propiedad</h3>
+                    <ul>
+                        <li><strong>Precio:</strong> ${{ "{:,.0f}".format(property[2]) }} MXN</li>
+                        <li><strong>Recámaras:</strong> {{ property[5] }}</li>
+                        <li><strong>Baños:</strong> {{ property[6] }}</li>
+                        <li><strong>Espacio para auto(s):</strong> {{ property[7] }}</li>
+                        <li><strong>Área:</strong> {{ property[8] }} m²</li>
+                        <li><strong>Colonia:</strong> {{ property[9] }}</li>
+                        <li><strong>Municipio:</strong> {{ property[10] }}</li>
+                    </ul>
+                    <!-- Botón para scroll al mapa -->
+                    <a href="#map" class="btn btn-contact-like mt-3">Ver Ubicación en Mapa</a>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-md-4">
+                <div class="contact-form">
+                    <h3>Contacto</h3>
+                    <form action="/send_contact" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre:</label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo:</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="nombre@correo.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phonenumber" class="form-label">Teléfono:</label>
+                            <input type="phonenumber" id="phonenumber" name="phonenumber" class="form-control" placeholder="Tu teléfono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Mensaje:</label>
+                            <textarea id="message" name="message" rows="4" class="form-control" placeholder="Tu mensaje" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <div class="gallery-container mt-5">
+            <h3>Galería de Imágenes</h3>
+            <div class="row">
                 {% for image in images %}
-                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-                    <img src="{{ url_for('static', filename='images/properties/' + image) }}" class="d-block w-100" alt="{{ property[1] }}">
+                <div class="col-md-4">
+                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}" 
+                         class="img-fluid lightbox-image" alt="{{ property[1] }}">
                 </div>
                 {% endfor %}
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Siguiente</span>
-            </button>
+        </div>
+
+        <!-- Map Section -->
+        <div class="map-section mt-5" id="map">
+            <h3>Ubicación de la Propiedad</h3>
+            <div class="ratio ratio-16x9">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3731.0122507200226!2d-103.4039077758789!3d20.75029754638672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af81e9e8ea75%3A0x98b0913a6ae03bf1!2sC.%20Villaca%C3%B1as%202766%2C%20Colinas%20del%20Rey%2C%2045130%20Zapopan%2C%20Jal.!5e0!3m2!1ses!2smx!4v1734049606422!5m2!1ses!2smx" 
+                    style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <h3>Detalles</h3>
-        <ul>
-            <li><strong>Precio:</strong> ${{ "{:,}".format(property[2]) }} MXN</li>
-            <li><strong>Operación:</strong> {{ property[3] }}</li>
-            <li><strong>Tipo:</strong> {{ property[4] }}</li>
-            <li><strong>Recámaras:</strong> {{ property[5] }}</li>
-            <li><strong>Baños:</strong> {{ property[6] }}</li>
-            <li><strong>Estacionamientos:</strong> {{ property[7] }}</li>
-            <li><strong>Área:</strong> {{ property[8] }} m²</li>
-            <li><strong>Colonia:</strong> {{ property[9] }}</li>
-            <li><strong>Municipio:</strong> {{ property[10] }}</li>
-        </ul>
+
+    <!-- Lightbox -->
+    <div class="lightbox-backdrop" id="lightbox-backdrop">
+        <img id="lightbox-image" src="" alt="Imagen en grande">
     </div>
-</div>
-<div class="mt-5">
-    <a href="{{ url_for('properties') }}" class="btn btn-secondary">Volver a las Propiedades</a>
-</div>
-{% endblock %}
+    <div class="lightbox-controls" id="lightbox-controls">
+        <button id="prev-image">&lt;</button>
+        <button id="next-image">&gt;</button>
+    </div>
+    <button class="lightbox-close" id="close-lightbox">&times;</button>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container mt-5 text-center">
+            <p>&copy; 2024 Fuerza Inmobiliaria de Occidente. Todos los derechos reservados.</p>
+            <div class="social-icons">
+                <a href="https://facebook.com" target="_blank"><i class="bi bi-facebook"></i></a>
+                <a href="https://twitter.com" target="_blank"><i class="bi bi-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const images = document.querySelectorAll('.lightbox-image');
+        const lightbox = document.getElementById('lightbox-backdrop');
+        const controls = document.getElementById('lightbox-controls');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const closeBtn = document.getElementById('close-lightbox');
+        const prevBtn = document.getElementById('prev-image');
+        const nextBtn = document.getElementById('next-image');
+
+        let currentIndex = 0;
+
+        function showImage(index) {
+            currentIndex = index;
+            lightboxImage.src = images[currentIndex].src;
+            lightbox.style.display = 'flex';
+            controls.style.display = 'flex';
+            closeBtn.style.display = 'flex';
+        }
+
+        function hideLightbox() {
+            lightbox.style.display = 'none';
+            controls.style.display = 'none';
+            closeBtn.style.display = 'none';
+        }
+
+        images.forEach((img, index) => {
+            img.addEventListener('click', () => showImage(index));
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % images.length;
+            showImage(currentIndex);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            showImage(currentIndex);
+        });
+
+        closeBtn.addEventListener('click', hideLightbox);
+    </script>
+</body>
+</html>
