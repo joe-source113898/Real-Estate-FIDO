@@ -42,10 +42,10 @@ body {
 
 /* Hero Section Logo */
 .hero-logo {
-    width: 300px; /* Adjust the size of the logo */
-    height: auto; /* Maintain the aspect ratio */
+    width: 300px; /* Adjust logo size */
+    height: auto; /* Maintain aspect ratio */
     margin-top: 1rem; /* Add some spacing */
-    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* Subtle shadow effect */
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* Subtle shadow */
 }
 
 /* Gradient Animation */
@@ -63,7 +63,7 @@ body {
 
 /* Navbar */
 .navbar {
-    background-color: #003566; /* Dark blue background for navbar */
+    background-color: #003566; /* Dark blue background */
     border-bottom: 4px solid #00b4d8; /* Bright blue bottom border */
 }
 
@@ -155,16 +155,16 @@ section {
 .service-item {
     border-radius: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: #f8f9fa; /* Light background for the card */
+    background-color: #f8f9fa; /* Light background */
     padding: 1rem;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 .service-item:hover {
-    transform: translateY(-10px); /* Lift card on hover */
+    transform: translateY(-10px); /* Lift on hover */
     box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-    background-color: #e8f0ff; /* Subtle blue background on hover */
+    background-color: #e8f0ff; /* Subtle blue on hover */
 }
 
 /* Service Item Image */
@@ -350,7 +350,7 @@ section {
 
 /* Footer */
 footer {
-    background-color: #003566; /* Dark blue background for footer */
+    background-color: #003566; /* Dark blue background */
     color: #ffffff; /* White text */
     padding: 2rem 0; /* Inner spacing */
     border-top: 4px solid #00b4d8; /* Bright blue top border */
@@ -400,7 +400,7 @@ footer .social-icons a:hover {
         line-height: 1.5;
     }
 
-    /* Hero Section Adjustments */
+    /* Hero Section Adjustments for Mobile */
     .hero-section {
         padding: 3rem 1rem;
         text-align: center;
@@ -424,14 +424,14 @@ footer .social-icons a:hover {
         margin-top: 0.5rem;
     }
 
-    /* Agents Section Adjustments */
+    /* Agents Section Adjustments for Mobile */
     .agent-card {
         width: 90%;
         margin: 1rem auto;
     }
 
-    /* Navbar Adjustments */
-     .navbar-brand {
+    /* Navbar Adjustments for Mobile */
+    .navbar-brand {
         font-size: 1rem; /* Reduce font size for mobile */
         text-align: center;
     }
@@ -443,7 +443,7 @@ footer .social-icons a:hover {
     }
 
     .navbar {
-        padding: 0.5rem 1rem; /* Reduce padding for smaller screens */
+        padding: 0.5rem 1rem; /* Reduce padding on small screens */
     }
 
     .navbar-nav {
@@ -453,4 +453,50 @@ footer .social-icons a:hover {
     .nav-item {
         margin-bottom: 0.5rem;
     }
+}
+
+/* Carousel Arrows Customization on agents.html */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background: none; /* Remove background image */
+    border-radius: 50%; 
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: invert(0); /* Remove invert */
+    color: #fff; 
+    font-size: 2rem; /* Increase font size for the symbols */
+    font-weight: bold;
+}
+
+.carousel-control-prev-icon::before,
+.carousel-control-next-icon::before {
+    content: ''; /* Reset content before specifying it in each arrow */
+}
+
+.carousel-control-prev-icon::before {
+    content: '<';
+}
+
+.carousel-control-next-icon::before {
+    content: '>';
+}
+
+/* Adjust arrow position and hover effect */
+.carousel-control-prev,
+.carousel-control-next {
+    width: auto;
+    height: auto;
+    background: none;
+    border: none;
+    opacity: 1; /* Always visible */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    transform: scale(1.1); /* Slight enlargement on hover */
 }
