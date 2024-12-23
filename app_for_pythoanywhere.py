@@ -4,6 +4,7 @@ import uuid
 import csv
 import shutil
 import sqlite3
+import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -14,7 +15,6 @@ from fpdf import FPDF
 import gspread
 from google.oauth2.service_account import Credentials
 from email_validator import validate_email, EmailNotValidError
-
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -292,15 +292,44 @@ def properties():
         }
     )
 
-@app.route('/property/<int:property_id>')
-def property_detail(property_id):
+############################
+#     SLUGIFY UTIL         #
+############################
+
+def slugify(text):
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9]+', '-', text)
+    text = text.strip('-')
+    return text
+
+@app.template_filter('slugify')
+def slugify_filter(s):
+    return slugify(s)
+
+############################
+#   PROPERTY DETAIL (Slug) #
+############################
+
+@app.route('/property/<int:property_id>/<slug>')
+def property_detail(property_id, slug):
     property_data = get_property_by_id(property_id)
-    if property_data:
-        images = property_data[14].split(',') if property_data[14] else []
-        agents = load_agents()
-        return render_template('property_detail.html', property=property_data, images=images, agents=agents)
-    flash('Propiedad no encontrada.', 'danger')
-    return redirect(url_for('index')), 404
+    if not property_data:
+        flash('Propiedad no encontrada.', 'danger')
+        return redirect(url_for('index')), 404
+
+    # Generar slug real a partir del nombre de la propiedad
+    generated_slug = slugify(property_data[1])
+    if slug != generated_slug:
+        # Redirigir con el slug correcto si difiere
+        return redirect(url_for('property_detail', property_id=property_id, slug=generated_slug), code=301)
+
+    images = property_data[14].split(',') if property_data[14] else []
+    agents = load_agents()
+    return render_template('property_detail.html', property=property_data, images=images, agents=agents)
+
+############################
+#   PROPERTY PDF           #
+############################
 
 @app.route('/property/<int:property_id>/pdf', methods=['GET'])
 def property_pdf(property_id):
@@ -632,7 +661,7 @@ def toggle_status(property_id):
     return redirect(url_for('admin_properties'))
 
 ############################
-#   GENERAL PDF            #
+#  GENERAL PDF (All Props) #
 ############################
 
 @app.route('/properties/pdf', methods=['GET'])
@@ -684,7 +713,6 @@ def properties_pdf():
         else:
             pdf.ln(10)
 
-        pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, f"Precio: ${int(prop[2]):,} MXN", ln=True, align='C')
         pdf.cell(0, 10, f"Tipo de Operación: {prop[3].capitalize()}", ln=True, align='C')
         pdf.cell(0, 10, f"Tipo de Propiedad: {prop[4].capitalize()}", ln=True, align='C')
