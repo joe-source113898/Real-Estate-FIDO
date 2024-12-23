@@ -1,44 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ property[1] }} - Detalles</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='images/logo_dark_background.png') }}" alt="Logo" class="logo me-2">
-                Fuerza Inmobiliaria de Occidente
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#about">Sobre Nosotros</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('agents') }}">Agentes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#services">Servicios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('properties') }}">Propiedades</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contacto</a></li>
-                </ul>
-                <div class="d-flex ms-lg-3">
-                    <a href="https://facebook.com" target="_blank" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                    <a href="https://twitter.com" target="_blank" class="text-white me-3"><i class="bi bi-twitter"></i></a>
-                    <a href="https://instagram.com" target="_blank" class="text-white"><i class="bi bi-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+{% extends 'base_template.html' %}
+{% block title %}
+    {{ property[1] }} - Detalles
+{% endblock %}
+{% block content %}
     <!-- Property Header -->
     <div class="property-header" style="background: url('{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + images[0]) }}') center/cover no-repeat;">
         <div class="overlay">
@@ -54,15 +18,24 @@
                     <h3>Detalles de la Propiedad</h3>
                     <ul>
                         <li><strong>Precio:</strong> ${{ "{:,.0f}".format(property[2]) }} MXN</li>
-                        <li><strong>Recámaras:</strong> {{ property[5] }}</li>
-                        <li><strong>Baños:</strong> {{ property[6] }}</li>
+                        <li><strong>Recámara(s):</strong> {{ property[5] }}</li>
+                        <li><strong>Baño(s):</strong> 
+                            {% if property[6] | float == property[6] | int %}
+                                {{ "{:.0f}".format(property[6]) }}
+                            {% else %}
+                                {{ "{:.1f}".format(property[6]) }}
+                            {% endif %}
+                        </li>
                         <li><strong>Espacio para auto(s):</strong> {{ property[7] }}</li>
                         <li><strong>Área:</strong> {{ property[8] }} m²</li>
-                        <li><strong>Colonia:</strong> {{ property[9] }}</li>
-                        <li><strong>Municipio:</strong> {{ property[10] }}</li>
+                        <li><strong>Dirección:</strong> 
+                            <p class="d-inline">{{ property[9] }}, {{ property[10] }}, {{ property[11] }}</p>
+                        </li>
                     </ul>
-                    <!-- Botón para scroll al mapa -->
-                    <a href="#map" class="btn btn-contact-like mt-3">Ver Ubicación en Mapa</a>
+                    <!-- Button to Go to Gallery -->
+                    <a href="#gallery" class="btn btn-primary mt-3">Ver Galería de Imágenes</a>
+                    <!-- Button to Go to Map -->
+                    <a href="#map" class="btn btn-primary mt-3">Ver Ubicación en Mapa</a>
                 </div>
             </div>
 
@@ -70,7 +43,10 @@
             <div class="col-md-4">
                 <div class="contact-form">
                     <h3>Contacto</h3>
-                    <form action="/send_contact" method="POST">
+                    <form action="{{ url_for('send_contact') }}" method="POST">
+                        <!-- Campo Oculto con la URL de la Propiedad -->
+                        <input type="hidden" name="property_url" value="{{ request.url }}">
+                        
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre:</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Tu nombre" required>
@@ -81,7 +57,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="phonenumber" class="form-label">Teléfono:</label>
-                            <input type="phonenumber" id="phonenumber" name="phonenumber" class="form-control" placeholder="Tu teléfono" required>
+                            <input type="tel" id="phonenumber" name="phonenumber" class="form-control" placeholder="Tu teléfono" required>
                         </div>
                         <div class="mb-3">
                             <label for="message" class="form-label">Mensaje:</label>
@@ -93,12 +69,45 @@
             </div>
         </div>
 
+        <!-- Property Sharing Options -->
+        <div class="share-options mt-4">
+            <h4>Comparte esta propiedad:</h4>
+            <button id="copy-link" class="btn btn-secondary me-2">
+                <i class="bi bi-clipboard"></i> Copiar Enlace
+            </button>
+            <a href="#" id="share-facebook" class="btn btn-primary me-2" target="_blank">
+                <i class="bi bi-facebook"></i> Facebook
+            </a>
+            <a href="#" id="share-whatsapp" class="btn btn-success" target="_blank">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+
+        <!-- Button to Download Property Information in PDF -->
+        <div class="download-pdf mt-4">
+            <h4>Descarga la información de esta propiedad:</h4>
+            <a href="{{ url_for('property_pdf', property_id=property[0]) }}" class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+            </a>
+        </div>
+
+        <!-- Button to Contact via WhatsApp and Call Agent -->
+        <div class="whatsapp-contact mt-4">
+            <h4>¿Te interesa la propiedad o tienes preguntas? Contacta a nuestro agente inmobiliario <span id="agent-name"></span>:</h4>
+            <button id="contact-whatsapp" class="btn btn-success me-2">
+                <i class="bi bi-whatsapp"></i> Contactar por WhatsApp
+            </button>
+            <button id="call-agent" class="btn btn-secondary">
+                <i class="bi bi-telephone"></i> Llamar al agente
+            </button>
+        </div>
+
         <!-- Gallery Section -->
-        <div class="gallery-container mt-5">
+        <div class="gallery-container mt-5" id="gallery">
             <h3>Galería de Imágenes</h3>
             <div class="row">
                 {% for image in images %}
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}" 
                          class="img-fluid lightbox-image" alt="{{ property[1] }}">
                 </div>
@@ -110,39 +119,90 @@
         <div class="map-section mt-5" id="map">
             <h3>Ubicación de la Propiedad</h3>
             <div class="ratio ratio-16x9">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3731.0122507200226!2d-103.4039077758789!3d20.75029754638672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af81e9e8ea75%3A0x98b0913a6ae03bf1!2sC.%20Villaca%C3%B1as%202766%2C%20Colinas%20del%20Rey%2C%2045130%20Zapopan%2C%20Jal.!5e0!3m2!1ses!2smx!4v1734049606422!5m2!1ses!2smx" 
-                    style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                {% if property[12] %}
+                    <iframe 
+                        src="https://www.google.com/maps?q={{ property[12] }}&output=embed"
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                {% else %}
+                    <p>No hay ubicación disponible para esta propiedad.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <!-- Lightbox -->
-    <div class="lightbox-backdrop" id="lightbox-backdrop">
-        <img id="lightbox-image" src="" alt="Imagen en grande">
+    <div class="lightbox-backdrop" id="lightbox-backdrop" style="display: none;">
+        <img id="lightbox-image" src="" alt="Imagen en grande" style="max-width: 90%; max-height: 90%;">
     </div>
-    <div class="lightbox-controls" id="lightbox-controls">
-        <button id="prev-image">&lt;</button>
-        <button id="next-image">&gt;</button>
+    <div class="lightbox-controls" id="lightbox-controls" style="display: none;">
+        <button id="prev-image" class="btn btn-light">&lt;</button>
+        <button id="next-image" class="btn btn-light">&gt;</button>
     </div>
-    <button class="lightbox-close" id="close-lightbox">&times;</button>
+    <button class="lightbox-close btn btn-light" id="close-lightbox" style="display: none;">&times;</button>
+{% endblock %}
 
-    <!-- Footer -->
-    <footer>
-        <div class="container mt-5 text-center">
-            <p>&copy; 2024 Fuerza Inmobiliaria de Occidente. Todos los derechos reservados.</p>
-            <div class="social-icons">
-                <a href="https://facebook.com" target="_blank"><i class="bi bi-facebook"></i></a>
-                <a href="https://twitter.com" target="_blank"><i class="bi bi-twitter"></i></a>
-                <a href="https://instagram.com" target="_blank"><i class="bi bi-instagram"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
+{% block scripts %}
     <script>
+        const agents = {{ agents | tojson }};
+
+        let selectedAgent = null;
+        function selectRandomAgent() {
+            if (agents.length === 0) {
+                alert('No hay agentes disponibles en este momento.');
+                return null;
+            }
+            return agents[Math.floor(Math.random() * agents.length)];
+        }
+
+        function updateAgentInfo(agent) {
+            if (agent) {
+                document.getElementById('agent-name').textContent = agent.Name.split(' ')[0];
+            } else {
+                document.getElementById('agent-name').textContent = 'No disponible';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            selectedAgent = selectRandomAgent();
+            updateAgentInfo(selectedAgent);
+            configureButtons(selectedAgent);
+        });
+
+        function configureButtons(agent) {
+            if (!agent) return;
+
+            document.getElementById('contact-whatsapp').addEventListener('click', () => {
+                const message = encodeURIComponent(`Hola, te estoy contactando desde la página web de Fuerza Inmobiliaria de Occidente. Me interesa esta propiedad: ${window.location.origin + window.location.pathname + window.location.search}`);
+                const whatsappURL = `https://api.whatsapp.com/send?phone=${agent.Cellphone}&text=${message}`;
+                window.open(whatsappURL, '_blank');
+            });
+
+            document.getElementById('call-agent').addEventListener('click', () => {
+                const telURL = `tel:${agent.Cellphone}`;
+                window.location.href = telURL;
+            });
+        }
+
+        document.getElementById('copy-link').addEventListener('click', () => {
+            const cleanURL = window.location.origin + window.location.pathname + window.location.search;
+            
+            navigator.clipboard.writeText(cleanURL).then(() => {
+                alert('Enlace copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar el enlace: ', err);
+                alert('Ocurrió un error al copiar el enlace.');
+            });
+        });
+
+        const currentURL = encodeURIComponent(window.location.origin + window.location.pathname + window.location.search);
+
+        document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${currentURL}`;
+        document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${currentURL}`;
+
         const images = document.querySelectorAll('.lightbox-image');
         const lightbox = document.getElementById('lightbox-backdrop');
         const controls = document.getElementById('lightbox-controls');
@@ -183,5 +243,4 @@
 
         closeBtn.addEventListener('click', hideLightbox);
     </script>
-</body>
-</html>
+{% endblock %}

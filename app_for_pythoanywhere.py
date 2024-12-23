@@ -16,13 +16,15 @@ from google.oauth2.service_account import Credentials
 from email_validator import validate_email, EmailNotValidError
 
 
-load_dotenv()
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 app = Flask(__name__)
 
 app.secret_key = os.getenv('SECRET_KEY')
 
-app.config['UPLOAD_FOLDER'] = 'static/images/properties'
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static', 'images', 'properties')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -36,7 +38,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', app.config[
 mail = Mail(app)
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE', 'service-account-file.json')
+SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE', os.path.join(BASE_DIR, 'service-account-file.json'))
 
 if not os.path.isfile(SERVICE_ACCOUNT_FILE):
     raise FileNotFoundError(f"No se encontró el archivo de credenciales: {SERVICE_ACCOUNT_FILE}")
@@ -53,12 +55,13 @@ except Exception as e:
     worksheet = None
 
 ############################
-# Inicialización de la DB #
+# Initializing the DB      #
 ############################
 
+DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
+
 def init_db():
-    """Crea la tabla properties si no existe."""
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS properties (
@@ -82,8 +85,10 @@ def init_db():
     conn.commit()
     conn.close()
 
+init_db()
+
 def load_properties():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM properties")
     properties = cursor.fetchall()
@@ -91,7 +96,7 @@ def load_properties():
     return properties
 
 def get_property_by_id(property_id):
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM properties WHERE id = ?", (property_id,))
     property_data = cursor.fetchone()
@@ -101,8 +106,7 @@ def get_property_by_id(property_id):
 def load_filtered_properties(operation=None, property_type=None, min_price=None, max_price=None,
                              bedrooms=None, bathrooms=None, parking=None, colony=None,
                              municipality=None, limit=None, offset=None):
-    """Carga propiedades filtradas según los parámetros recibidos."""
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     query = "SELECT * FROM properties WHERE status = 'Normal'"
@@ -135,7 +139,7 @@ def load_filtered_properties(operation=None, property_type=None, min_price=None,
     if municipality and municipality.strip():
         query += " AND municipality LIKE ?"
         params.append(f"%{municipality}%")
-    
+
     if limit is not None:
         query += " LIMIT ?"
         params.append(limit)
@@ -152,8 +156,7 @@ def load_filtered_properties(operation=None, property_type=None, min_price=None,
 def count_filtered_properties(operation=None, property_type=None, min_price=None, max_price=None,
                               bedrooms=None, bathrooms=None, parking=None, colony=None,
                               municipality=None):
-    """Cuenta cuántas propiedades hay con el filtro aplicado."""
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     query = "SELECT COUNT(*) FROM properties WHERE status = 'Normal'"
@@ -186,27 +189,28 @@ def count_filtered_properties(operation=None, property_type=None, min_price=None
     if municipality and municipality.strip():
         query += " AND municipality LIKE ?"
         params.append(f"%{municipality}%")
-    
+
     cursor.execute(query, params)
     count = cursor.fetchone()[0]
     conn.close()
 
     return count
 
+AGENTS_CSV_PATH = os.path.join(BASE_DIR, 'agents.csv')
+
 def load_agents():
-    """Carga la lista de agentes desde un CSV."""
     agents = []
     try:
-        with open('agents.csv', newline='', encoding='utf-8') as csvfile:
+        with open(AGENTS_CSV_PATH, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 agents.append({'Name': row['Name'], 'Cellphone': row['Cellphone']})
     except FileNotFoundError:
-        print("El archivo agents.csv no se encontró.")
+        print(f"El archivo {AGENTS_CSV_PATH} no se encontró.")
     return agents
 
 ############################
-#   RUTAS PÚBLICAS         #
+#   PUBLIC ROUTES          #
 ############################
 
 @app.route('/')
@@ -223,7 +227,6 @@ def contact():
 
 @app.route('/properties', methods=['GET'])
 def properties():
-    """Página que muestra las propiedades, con filtros y paginación."""
     operation = request.args.get('operation')
     property_type = request.args.get('type')
     min_price = request.args.get('min_price')
@@ -234,7 +237,6 @@ def properties():
     colony = request.args.get('colony')
     municipality = request.args.get('municipality')
 
-    # Manejo de paginación
     try:
         page = int(request.args.get('page', 1))
         if page < 1:
@@ -292,7 +294,6 @@ def properties():
 
 @app.route('/property/<int:property_id>')
 def property_detail(property_id):
-    """Muestra la información de una propiedad en detalle."""
     property_data = get_property_by_id(property_id)
     if property_data:
         images = property_data[14].split(',') if property_data[14] else []
@@ -303,23 +304,21 @@ def property_detail(property_id):
 
 @app.route('/property/<int:property_id>/pdf', methods=['GET'])
 def property_pdf(property_id):
-    """Genera un PDF con la información de una propiedad."""
     property_data = get_property_by_id(property_id)
     if not property_data:
         flash('Propiedad no encontrada.', 'danger')
         abort(404, description="Propiedad no encontrada")
-    
+
     images = property_data[14].split(',') if property_data[14] else []
-    
+
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    
+
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(0, 10, property_data[1], ln=True, align='C')
     pdf.ln(10)
-    
-    # Insertar las imágenes en el PDF
+
     for image in images:
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], str(property_id), image)
         if os.path.exists(image_path):
@@ -328,9 +327,9 @@ def property_pdf(property_id):
                 pdf.ln(10)
             except RuntimeError as e:
                 print(f"Error al cargar la imagen {image_path}: {e}")
-    
+
     pdf.set_font("Arial", size=12)
-    
+
     banos = float(property_data[6])
     banos_str = str(int(banos)) if banos.is_integer() else str(banos)
 
@@ -344,14 +343,14 @@ def property_pdf(property_id):
         f"Área: {property_data[8]} m²",
         f"Dirección: {property_data[9]}, {property_data[10]}, {property_data[11]}"
     ]
-    
+
     for detail in details:
         pdf.cell(0, 10, detail, ln=True, align='C')
-    
+
     pdf_content = pdf.output(dest='S').encode('latin1')
     pdf_buffer = io.BytesIO(pdf_content)
     pdf_buffer.seek(0)
-    
+
     return send_file(
         pdf_buffer,
         as_attachment=True,
@@ -365,11 +364,10 @@ def property_pdf(property_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Muestra un formulario de login y gestiona la sesión del admin."""
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
+
         admin_user = os.getenv('ADMIN_USER')
         admin_pass = os.getenv('ADMIN_PASSWORD')
 
@@ -381,21 +379,16 @@ def login():
         else:
             flash("Credenciales inválidas.", 'danger')
             return redirect(url_for('login'))
-    
+
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    """Cierra la sesión del usuario y redirige al login."""
     session.pop('logged_in', None)
     flash('Has cerrado sesión correctamente.', 'success')
     return redirect(url_for('login'))
 
 def admin_required(func):
-    """
-    Decorador para proteger rutas de administración.
-    Redirige a /login si el usuario no está autenticado.
-    """
     from functools import wraps
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -406,13 +399,12 @@ def admin_required(func):
     return wrapper
 
 ############################
-#     RUTAS DE ADMIN       #
+#     ADMIN ROUTES         #
 ############################
 
 @app.route('/admin/properties')
 @admin_required
 def admin_properties():
-    """Vista principal del panel de administración de propiedades."""
     properties = load_properties()
     if session.get('welcome_message'):
         flash('Bienvenido al panel de administración.', 'info')
@@ -437,7 +429,7 @@ def add_property():
         map_location = request.form.get('map_location', '')
 
         try:
-            conn = sqlite3.connect('database.db')
+            conn = sqlite3.connect(DATABASE_PATH)
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO properties (name, price, operation, type, bedrooms, bathrooms, parking_spaces, area, address, colony, municipality, map_location, status, images)
@@ -514,12 +506,12 @@ def edit_property(property_id):
         status = request.form.get('status', property_data[13])
 
         try:
-            conn = sqlite3.connect('database.db')
+            conn = sqlite3.connect(DATABASE_PATH)
             cursor = conn.cursor()
             cursor.execute('''
                 UPDATE properties
-                SET name = ?, price = ?, operation = ?, type = ?, bedrooms = ?, bathrooms = ?, 
-                    parking_spaces = ?, area = ?, address = ?, colony = ?, municipality = ?, 
+                SET name = ?, price = ?, operation = ?, type = ?, bedrooms = ?, bathrooms = ?,
+                    parking_spaces = ?, area = ?, address = ?, colony = ?, municipality = ?,
                     map_location = ?, status = ?, images = ?
                 WHERE id = ?
             ''', (name, price, operation, property_type, bedrooms, bathrooms, parking_spaces,
@@ -539,13 +531,12 @@ def edit_property(property_id):
 @app.route('/admin/properties/delete/<int:property_id>', methods=['POST'])
 @admin_required
 def delete_property(property_id):
-    """Elimina una propiedad y su carpeta de imágenes."""
     try:
         property_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(property_id))
         if os.path.exists(property_folder):
             shutil.rmtree(property_folder)
 
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM properties WHERE id = ?", (property_id,))
         conn.commit()
@@ -560,7 +551,6 @@ def delete_property(property_id):
 @app.route('/admin/properties/delete_image/<int:property_id>', methods=['POST'])
 @admin_required
 def delete_image(property_id):
-    """Elimina una imagen específica de una propiedad."""
     filename = request.form.get('filename')
     if not filename:
         flash('Nombre de archivo no proporcionado.', 'danger')
@@ -582,7 +572,7 @@ def delete_image(property_id):
 
     updated_images = [img for img in existing_images if img != filename]
     try:
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE properties
@@ -600,9 +590,8 @@ def delete_image(property_id):
 @app.route('/admin/properties/delete_all', methods=['POST'])
 @admin_required
 def delete_all_properties():
-    """Elimina todas las propiedades y sus carpetas de imágenes."""
     try:
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM properties")
         conn.commit()
@@ -621,9 +610,8 @@ def delete_all_properties():
 @app.route('/admin/properties/toggle_status/<int:property_id>', methods=['POST'])
 @admin_required
 def toggle_status(property_id):
-    """Alterna el estado de la propiedad entre 'Normal' y 'En pausa'."""
     try:
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT status FROM properties WHERE id = ?", (property_id,))
         result = cursor.fetchone()
@@ -644,12 +632,11 @@ def toggle_status(property_id):
     return redirect(url_for('admin_properties'))
 
 ############################
-#   PDF GENERAL            #
+#   GENERAL PDF            #
 ############################
 
 @app.route('/properties/pdf', methods=['GET'])
 def properties_pdf():
-    """Genera un PDF con todas las propiedades filtradas (sin proteger la ruta)."""
     operation = request.args.get('operation')
     property_type = request.args.get('type')
     min_price = request.args.get('min_price')
@@ -674,7 +661,7 @@ def properties_pdf():
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    
+
     for prop in filtered_props:
         pdf.add_page()
         pdf.set_font("Arial", 'B', 16)
@@ -706,7 +693,7 @@ def properties_pdf():
         valor = float(prop[6])
         valor_str = str(int(valor)) if valor.is_integer() else str(valor)
         pdf.cell(0, 10, f"Baño(s): {valor_str}", ln=True, align='C')
-        
+
         pdf.cell(0, 10, f"Espacio para auto(s): {prop[7]}", ln=True, align='C')
         pdf.cell(0, 10, f"Área: {prop[8]} m²", ln=True, align='C')
         pdf.cell(0, 10, f"Dirección: {prop[9]}", ln=True, align='C')
@@ -726,15 +713,11 @@ def properties_pdf():
     )
 
 ############################
-#  RUTA CONTACTO (FORM)    #
+#  CONTACT ROUTE (FORM)    #
 ############################
 
 @app.route('/send_contact', methods=['POST'])
 def send_contact():
-    """
-    Procesa los datos del formulario de contacto,
-    envía correo con Flask-Mail y registra en Google Sheets (si está disponible).
-    """
     name = request.form.get('name')
     email = request.form.get('email')
     phonenumber = request.form.get('phonenumber')
@@ -744,7 +727,7 @@ def send_contact():
     if not name or not email or not phonenumber or not message:
         flash('Por favor, completa todos los campos del formulario.', 'danger')
         return redirect(request.referrer or url_for('index'))
-    
+
     try:
         valid = validate_email(email)
         email = valid.email
@@ -793,16 +776,15 @@ def send_contact():
     except Exception as e:
         print(f"Error al enviar el correo o registrar en Sheets: {e}")
         flash('Ocurrió un error al enviar tu mensaje. Por favor, inténtalo de nuevo más tarde.', 'danger')
-    
+
     return redirect(request.referrer or url_for('index'))
 
 ############################
-#     DEBUG DE SHEETS      #
+#     DEBUG SHEETS         #
 ############################
 
 @app.route('/debug_sheets')
 def debug_sheets():
-    """Ruta de prueba para verificar la autenticación con Google Sheets."""
     if not worksheet:
         flash("No se pudo autenticar con Google Sheets.", 'danger')
         return redirect(url_for('index'))
@@ -820,5 +802,6 @@ def debug_sheets():
 ############################
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
+
+application = app

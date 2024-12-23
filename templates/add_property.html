@@ -28,12 +28,12 @@
         </select>
     </div>
     <div class="mb-3">
-        <label for="bedrooms">Recámaras</label>
+        <label for="bedrooms">Recámara(s)</label>
         <input type="number" name="bedrooms" class="form-control" required>
     </div>
     <div class="mb-3">
-        <label for="bathrooms">Baños</label>
-        <input type="number" name="bathrooms" class="form-control" required>
+        <label for="bathrooms">Baño(s)</label>
+        <input type="number" name="bathrooms" class="form-control" step="0.01" required>
     </div>
     <div class="mb-3">
         <label for="parking_spaces">Espacio para auto(s)</label>
@@ -41,7 +41,11 @@
     </div>
     <div class="mb-3">
         <label for="area">Área (m²)</label>
-        <input type="number" name="area" class="form-control" required>
+        <input type="text" name="area" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="address">Dirección</label>
+        <input type="text" name="address" class="form-control">
     </div>
     <div class="mb-3">
         <label for="colony">Colonia</label>
@@ -50,6 +54,10 @@
     <div class="mb-3">
         <label for="municipality">Municipio</label>
         <input type="text" name="municipality" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="map_location">Coordenadas (Lat, Long)</label>
+        <input type="text" name="map_location" class="form-control" placeholder="Ejemplo: 20.751507, -103.429817">
     </div>
     <div class="mb-3">
         <label for="images">Imágenes de la Propiedad</label>

@@ -1,33 +1,72 @@
 {% extends 'base.html' %}
-{% block title %}Administrar Propiedades{% endblock %}
+{% block title %}Administración de Propiedades{% endblock %}
 {% block content %}
-<h1>Administrar Propiedades</h1>
-<a href="{{ url_for('add_property') }}" class="btn btn-primary mb-3">Añadir Propiedad</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Precio</th>
-            <th>Operación</th>
-            <th>Tipo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for property in properties %}
-        <tr>
-            <td>{{ property[1] }}</td>
-            <td>{{ property[2] }}</td>
-            <td>{{ property[3] }}</td>
-            <td>{{ property[4] }}</td>
-            <td>
-                <a href="{{ url_for('edit_property', property_id=property[0]) }}" class="btn btn-sm btn-warning">Editar</a>
-                <form action="{{ url_for('delete_property', property_id=property[0]) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+    <!-- Header with the title and the logout button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Administración de Propiedades</h1>
+        <!-- Link to logout path -->
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary">Cerrar Sesión</a>
+    </div>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{{ url_for('add_property') }}" class="btn btn-primary">Añadir Propiedad</a>
+            <form action="{{ url_for('delete_all_properties') }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar todas las propiedades? Esta acción no se puede deshacer.');">
+                <button type="submit" class="btn btn-danger">Eliminar Todas las Propiedades</button>
+            </form>
+        </div>
+        <!-- Button to download the PDF of properties -->
+        <div>
+            <a href="{{ url_for('properties_pdf') }}" class="btn btn-secondary">Descargar PDF</a>
+        </div>
+    </div>
+
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Operación</th>
+                <th>Tipo</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for property in properties %}
+            <tr>
+                <td>{{ property[1] }}</td>
+                <td>${{ "{:,.2f}".format(property[2]) }}</td>
+                <td>{{ property[3] }}</td>
+                <td>{{ property[4] }}</td>
+                <td>
+                    <form action="{{ url_for('toggle_status', property_id=property[0]) }}" method="post">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="statusCheck{{ property[0] }}" onchange="this.form.submit()" {% if property[13] == 'En pausa' %}checked{% endif %}>
+                            <label class="form-check-label" for="statusCheck{{ property[0] }}">
+                                {% if property[13] == 'En pausa' %}
+                                    En pausa
+                                {% else %}
+                                    Normal
+                                {% endif %}
+                            </label>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <a href="{{ url_for('edit_property', property_id=property[0]) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ url_for('delete_property', property_id=property[0]) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer.');">
+                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">No hay propiedades disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

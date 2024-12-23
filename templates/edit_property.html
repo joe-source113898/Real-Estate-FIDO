@@ -2,6 +2,7 @@
 {% block title %}Editar Propiedad{% endblock %}
 {% block content %}
 <h1>Editar Propiedad</h1>
+<!-- Main form for editing data and adding new images -->
 <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="name">Nombre</label>
@@ -12,14 +13,14 @@
         <input type="number" name="price" class="form-control" value="{{ property[2] }}" required>
     </div>
     <div class="mb-3">
-        <label for="operation">Operación</label>
+        <label for="operation">Tipo de Operación (Venta/Renta)</label>
         <select name="operation" class="form-control" required>
             <option value="venta" {% if property[3] == 'venta' %}selected{% endif %}>Venta</option>
             <option value="renta" {% if property[3] == 'renta' %}selected{% endif %}>Renta</option>
         </select>
     </div>
     <div class="mb-3">
-        <label for="type">Tipo</label>
+        <label for="type">Tipo de Propiedad (Casa/Departamento/Local/Terreno)</label>
         <select name="type" class="form-control" required>
             <option value="casa" {% if property[4] == 'casa' %}selected{% endif %}>Casa</option>
             <option value="departamento" {% if property[4] == 'departamento' %}selected{% endif %}>Departamento</option>
@@ -28,44 +29,75 @@
         </select>
     </div>
     <div class="mb-3">
-        <label for="bedrooms">Recámaras</label>
+        <label for="bedrooms">Recámara(s)</label>
         <input type="number" name="bedrooms" class="form-control" value="{{ property[5] }}" required>
     </div>
     <div class="mb-3">
-        <label for="bathrooms">Baños</label>
-        <input type="number" name="bathrooms" class="form-control" value="{{ property[6] }}" required>
+        <label for="bathrooms">Baño(s)</label>
+        <input type="number" name="bathrooms" class="form-control" value="{{ property[6] }}" step="0.01" required>
     </div>
     <div class="mb-3">
-        <label for="parking_spaces">Estacionamientos</label>
+        <label for="parking_spaces">Espacio para auto(s)</label>
         <input type="number" name="parking_spaces" class="form-control" value="{{ property[7] }}" required>
     </div>
     <div class="mb-3">
         <label for="area">Área (m²)</label>
-        <input type="number" name="area" class="form-control" value="{{ property[8] }}" required>
+        <input type="text" name="area" class="form-control" value="{{ property[8] }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="address">Dirección</label>
+        <input type="text" name="address" class="form-control" value="{{ property[9] }}">
     </div>
     <div class="mb-3">
         <label for="colony">Colonia</label>
-        <input type="text" name="colony" class="form-control" value="{{ property[9] }}" required>
+        <input type="text" name="colony" class="form-control" value="{{ property[10] }}" required>
     </div>
     <div class="mb-3">
         <label for="municipality">Municipio</label>
-        <input type="text" name="municipality" class="form-control" value="{{ property[10] }}" required>
+        <input type="text" name="municipality" class="form-control" value="{{ property[11] }}" required>
     </div>
     <div class="mb-3">
-        <label for="images">Imágenes Nuevas (opcional)</label>
-        <input type="file" name="images" multiple accept="image/*" class="form-control">
-        <small class="form-text text-muted">Imágenes actuales:</small>
-        <div class="mt-2">
-            {% if property[11] %}
-                {% for image in property[11].split(',') %}
-                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}"
-                         alt="Imagen Actual" class="img-thumbnail me-2" style="width: 100px; height: auto;">
-                {% endfor %}
-            {% else %}
-                <p>No hay imágenes disponibles.</p>
-            {% endif %}
-        </div>
+        <label for="map_location">Coordenadas (Lat, Long)</label>
+        <input type="text" name="map_location" class="form-control" value="{{ property[12] }}" placeholder="Ejemplo: 20.751507, -103.429817">
     </div>
+
+    <!-- Field to add new images -->
+    <div class="mb-3">
+        <label for="images">Agregar Imágenes Nuevas (Opcional)</label>
+        <input type="file" name="images" multiple accept="image/*" class="form-control">
+        <small class="form-text text-muted">Puedes agregar nuevas imágenes aquí.</small>
+    </div>
+
+    <!-- Field to toggle status -->
+    <div class="mb-3">
+        <label for="status">Estado de la Propiedad</label>
+        <select name="status" class="form-control" required>
+            <option value="Normal" {% if property[13] == 'Normal' %}selected{% endif %}>Normal</option>
+            <option value="En pausa" {% if property[13] == 'En pausa' %}selected{% endif %}>En pausa</option>
+        </select>
+    </div>
+
+    <!-- Button to save changes to the main form -->
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
 </form>
+
+<!-- Section to delete existing images (outside the main form) -->
+<div class="mt-4">
+    <small class="form-text text-muted">Imágenes actuales (haz clic sobre una imagen para eliminarla):</small>
+    <div class="mt-2 d-flex flex-wrap">
+        {% if property[14] %}
+            {% for image in property[14].split(',') %}
+                <form action="{{ url_for('delete_image', property_id=property[0]) }}" method="POST" class="me-2 mb-2">
+                    <input type="hidden" name="filename" value="{{ image }}">
+                    <button type="submit" class="btn btn-link p-0 border-0" onclick="return confirm('¿Estás seguro de eliminar esta imagen?');">
+                        <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}"
+                             alt="Eliminar Imagen" class="img-thumbnail" style="width: 100px; height: auto;">
+                    </button>
+                </form>
+            {% endfor %}
+        {% else %}
+            <p>No hay imágenes disponibles.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

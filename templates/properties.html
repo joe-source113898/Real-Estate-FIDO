@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='images/logo_dark_background.png') }}" alt="Logo" class="logo me-2">
@@ -26,10 +26,9 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#about">Sobre Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('agents') }}">Agentes</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#services">Servicios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('properties') }}">Propiedades</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('properties') }}">Propiedades</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contacto</a></li>
                 </ul>
-                <!-- Social Media Icons in Navbar -->
                 <div class="d-flex ms-lg-3">
                     <a href="https://facebook.com" target="_blank" class="text-white me-3"><i class="bi bi-facebook"></i></a>
                     <a href="https://twitter.com" target="_blank" class="text-white me-3"><i class="bi bi-twitter"></i></a>
@@ -49,31 +48,163 @@
     <main class="py-5">
         <div class="container">
             <h2 class="text-center mb-4">Explora Nuestras Opciones</h2>
+
+            <!-- Filter and PDF buttons -->
+            <div class="text-end mb-3">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterForm" aria-expanded="false" aria-controls="filterForm">
+                    Filtrar Propiedades <i class="bi bi-funnel-fill"></i>
+                </button>
+                <a class="btn btn-success ms-2" href="#" id="pdfButton">Generar PDF <i class="bi bi-file-earmark-pdf-fill"></i></a>
+            </div>
+
+            <!-- Filter form (collapsible) -->
+            <div class="collapse mb-4" id="filterForm">
+                <div class="card card-body">
+                    <form method="GET" action="{{ url_for('properties') }}">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="operation" class="form-label">Tipo de operación:</label>
+                                <select class="form-select" id="operation" name="operation">
+                                    <option value="">Cualquiera</option>
+                                    <option value="venta" {% if filters.operation == 'venta' %}selected{% endif %}>Venta</option>
+                                    <option value="renta" {% if filters.operation == 'renta' %}selected{% endif %}>Renta</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="type" class="form-label">Tipo de propiedad:</label>
+                                <select class="form-select" id="type" name="type">
+                                    <option value="">Cualquiera</option>
+                                    <option value="casa" {% if filters.type == 'casa' %}selected{% endif %}>Casa</option>
+                                    <option value="departamento" {% if filters.type == 'departamento' %}selected{% endif %}>Departamento</option>
+                                    <option value="local" {% if filters.type == 'local' %}selected{% endif %}>Local</option>
+                                    <option value="terreno" {% if filters.type == 'terreno' %}selected{% endif %}>Terreno</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="min_price" class="form-label">Precio mínimo:</label>
+                                <input type="number" class="form-control" id="min_price" name="min_price" value="{{ filters.min_price or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="max_price" class="form-label">Precio máximo:</label>
+                                <input type="number" class="form-control" id="max_price" name="max_price" value="{{ filters.max_price or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="bedrooms" class="form-label">Recámara(s):</label>
+                                <input type="number" class="form-control" id="bedrooms" name="bedrooms" value="{{ filters.bedrooms or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="bathrooms" class="form-label">Baño(s):</label>
+                                <input type="number" class="form-control" id="bathrooms" name="bathrooms" value="{{ filters.bathrooms or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="parking" class="form-label">Espacio para auto(s):</label>
+                                <input type="number" class="form-control" id="parking" name="parking" value="{{ filters.parking or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="colony" class="form-label">Colonia:</label>
+                                <input type="text" class="form-control" id="colony" name="colony" value="{{ filters.colony or '' }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="municipality" class="form-label">Municipio:</label>
+                                <input type="text" class="form-control" id="municipality" name="municipality" value="{{ filters.municipality or '' }}">
+                            </div>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                            <a href="{{ url_for('properties') }}" class="btn btn-secondary ms-2">Limpiar Filtros</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Script to generate the PDF URL with current parameters -->
+            <script>
+                const pdfButton = document.getElementById('pdfButton');
+                const currentParams = new URLSearchParams(window.location.search);
+                pdfButton.href = "{{ url_for('properties_pdf') }}" + "?" + currentParams.toString();
+            </script>
+
             <div class="row">
-                {% for property in properties %}
-                <div class="col-md-4">
-                    <div class="card mb-4 property-item">
-                        <a href="{{ url_for('property_detail', property_id=property[0]) }}">
-                            {% if property[-1] and property[-1].split(',')[0] %}
-                                <!-- Show the first image if it exists -->
-                                <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + property[-1].split(',')[0]) }}" 
-                                     class="card-img-top" alt="{{ property[1] }}">
-                            {% else %}
-                                <!-- Show a default image if there are no images -->
-                                <img src="{{ url_for('static', filename='images/default_property.png') }}" 
-                                     class="card-img-top" alt="Imagen no disponible">
-                            {% endif %}
-                            <!-- Operation Label (Sale or Rent) -->
-                            <span class="operation-badge">{{ property[3] }}</span>
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ property[1] }}</h5>
-                            <p class="card-text">{{ property[5] }} recámaras, {{ property[6] }} baños - ${{ "{:,.0f}".format(property[2]) }} MXN</p>
+                {% if properties and properties|length > 0 %}
+                    {% for property in properties %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 property-item shadow-sm">
+                            <a href="{{ url_for('property_detail', property_id=property[0]) }}" class="text-decoration-none text-dark">
+                                {% if property[14] and property[14].split(',')[0] %}
+                                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + property[14].split(',')[0]) }}" 
+                                         class="card-img-top" alt="{{ property[1] }}">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/default_property.png') }}" 
+                                         class="card-img-top" alt="Imagen no disponible">
+                                {% endif %}
+                                <span class="operation-badge">{{ property[3] }}</span>
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ property[1] }}</h5>
+                                <p class="card-text">
+                                    {{ property[5] }} recámaras,
+                                    {% set bathrooms_float = property[6]|float %}
+                                    {% set bathrooms_int = property[6]|int %}
+                                    {% if bathrooms_float == bathrooms_int %}
+                                        {% set bathrooms_display = bathrooms_int %}
+                                    {% else %}
+                                        {% set bathrooms_display = bathrooms_float %}
+                                    {% endif %}
+                                
+                                    {% if bathrooms_display == 1 %}
+                                        {{ bathrooms_display }} baño
+                                    {% else %}
+                                        {{ bathrooms_display }} baños
+                                    {% endif %}
+                                    - ${{ "{:,.0f}".format(property[2]) }} MXN
+                                </p>
+                                <p class="text-muted">{{ property[10] }}, {{ property[11] }}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-            </div>            
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">No se encontraron propiedades con esos filtros.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination Controls -->
+            {% if total_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous Page Button -->
+                    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('properties', page=page-1, **filters) }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Numbered Page Buttons -->
+                    {% for p in range(1, total_pages + 1) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('properties', page=p, **filters) }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+                    
+                    <!-- Next Page Button -->
+                    <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('properties', page=page+1, **filters) }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </main>
 

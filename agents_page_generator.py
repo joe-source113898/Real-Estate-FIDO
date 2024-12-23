@@ -2,41 +2,33 @@ import pandas as pd
 import qrcode
 import os
 
-# Load the agents data
-csv_file = 'agents.csv'  # Adjust this to your file's location
+
+csv_file = 'agents.csv'
 agents_data = pd.read_csv(csv_file)
 
-# Ensure the 'Cellphone' column is treated as strings
 agents_data['Cellphone'] = agents_data['Cellphone'].astype(str)
 
-# Create directory for QR codes
 qr_directory = 'static/qr_codes'
 os.makedirs(qr_directory, exist_ok=True)
 
-# Function to format cellphone numbers
 def format_cellphone(cellphone):
-    # Convert input to string (if not)
     cellphone = str(cellphone).strip()
 
-    # Remove prefix '+52' if present
     if cellphone.startswith('+52'):
         cellphone = cellphone[3:]
 
-    # Remove any non-numeric characters
     cellphone = ''.join(filter(str.isdigit, cellphone))
     
-    # Check if number has exactly 12 digits after processing
     if len(cellphone) == 12:
         cellphone = cellphone.strip('52')
 
-        # Format 'XX XXXX XXXX'
         formatted = f"{cellphone[:2]} {cellphone[2:6]} {cellphone[6:]}"
         return formatted
     else:
-        # If not the expected size, return the original unformatted number
         return cellphone
 
-# Generate HTML for the agents page with a carousel
+total_agents = len(agents_data)
+
 html_output = """
 <!DOCTYPE html>
 <html lang="es">
@@ -52,7 +44,7 @@ html_output = """
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='images/logo_dark_background.png') }}" alt="Logo" class="logo me-2">
@@ -92,8 +84,7 @@ html_output = """
                 <div class="carousel-inner">
 """
 
-# Split agents into groups of 6 for the carousel
-for i in range(0, len(agents_data), 6):
+for i in range(0, total_agents, 6):
     group = agents_data.iloc[i:i+6]
     active_class = "active" if i == 0 else ""
     html_output += f'<div class="carousel-item {active_class}"><div class="row g-4">'
@@ -103,18 +94,14 @@ for i in range(0, len(agents_data), 6):
         cellphone = row['Cellphone']
         first_name = name.split()[0]
 
-        # Format the cellphone number
         formatted_cellphone = format_cellphone(cellphone)
 
-        # Generate WhatsApp message URL
         whatsapp_url = f"https://wa.me/{cellphone}?text=Hola%20{first_name},%20te%20contacto%20desde%20la%20p%C3%A1gina%20web%20de%20FIDO%20ya%20que%20requiero%20de%20tus%20servicios."
 
-        # Generate QR code
         qr_code_path = os.path.join(qr_directory, f"{first_name}.png")
         qr = qrcode.make(whatsapp_url)
         qr.save(qr_code_path)
 
-        # Append agent card to HTML
         html_output += f"""
                 <div class="col-md-4">
                     <div class="card agent-card shadow h-100">
@@ -133,6 +120,10 @@ for i in range(0, len(agents_data), 6):
 
 html_output += """
                 </div>
+"""
+
+if total_agents > 6:
+    html_output += """
                 <button class="carousel-control-prev" type="button" data-bs-target="#agentsCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Anterior</span>
@@ -141,6 +132,9 @@ html_output += """
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Siguiente</span>
                 </button>
+    """
+
+html_output += """
             </div>
         </div>
     </main>
@@ -162,7 +156,6 @@ html_output += """
 </html>
 """
 
-# Save the HTML file
 with open("templates/agents.html", "w", encoding="utf-8") as file:
     file.write(html_output)
 
