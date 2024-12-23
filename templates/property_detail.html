@@ -19,7 +19,7 @@
                     <ul>
                         <li><strong>Precio:</strong> ${{ "{:,.0f}".format(property[2]) }} MXN</li>
                         <li><strong>Recámara(s):</strong> {{ property[5] }}</li>
-                        <li><strong>Baño(s):</strong> 
+                        <li><strong>Baño(s):</strong>
                             {% if property[6] | float == property[6] | int %}
                                 {{ "{:.0f}".format(property[6]) }}
                             {% else %}
@@ -28,7 +28,7 @@
                         </li>
                         <li><strong>Espacio para auto(s):</strong> {{ property[7] }}</li>
                         <li><strong>Área:</strong> {{ property[8] }} m²</li>
-                        <li><strong>Dirección:</strong> 
+                        <li><strong>Dirección:</strong>
                             <p class="d-inline">{{ property[9] }}, {{ property[10] }}, {{ property[11] }}</p>
                         </li>
                     </ul>
@@ -46,7 +46,7 @@
                     <form action="{{ url_for('send_contact') }}" method="POST">
                         <!-- Campo Oculto con la URL de la Propiedad -->
                         <input type="hidden" name="property_url" value="{{ request.url }}">
-                        
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre:</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Tu nombre" required>
@@ -108,7 +108,7 @@
             <div class="row">
                 {% for image in images %}
                 <div class="col-md-4 mb-3">
-                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}" 
+                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + image) }}"
                          class="img-fluid lightbox-image" alt="{{ property[1] }}">
                 </div>
                 {% endfor %}
@@ -120,11 +120,11 @@
             <h3>Ubicación de la Propiedad</h3>
             <div class="ratio ratio-16x9">
                 {% if property[12] %}
-                    <iframe 
+                    <iframe
                         src="https://www.google.com/maps?q={{ property[12] }}&output=embed"
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
                 {% else %}
@@ -176,7 +176,9 @@
             if (!agent) return;
 
             document.getElementById('contact-whatsapp').addEventListener('click', () => {
-                const message = encodeURIComponent(`Hola, te estoy contactando desde la página web de Fuerza Inmobiliaria de Occidente. Me interesa esta propiedad: ${window.location.origin + window.location.pathname + window.location.search}`);
+                const message = encodeURIComponent(
+                    `Hola, te estoy contactando desde la página web de Fuerza Inmobiliaria de Occidente. Me interesa esta propiedad: ${window.location.origin + window.location.pathname + window.location.search}`
+                );
                 const whatsappURL = `https://api.whatsapp.com/send?phone=${agent.Cellphone}&text=${message}`;
                 window.open(whatsappURL, '_blank');
             });
@@ -189,7 +191,7 @@
 
         document.getElementById('copy-link').addEventListener('click', () => {
             const cleanURL = window.location.origin + window.location.pathname + window.location.search;
-            
+
             navigator.clipboard.writeText(cleanURL).then(() => {
                 alert('Enlace copiado al portapapeles');
             }).catch(err => {
