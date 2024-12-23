@@ -137,12 +137,14 @@
                     {% for property in properties %}
                     <div class="col-md-4">
                         <div class="card mb-4 property-item shadow-sm">
-                            <a href="{{ url_for('property_detail', property_id=property[0]) }}" class="text-decoration-none text-dark">
+                            <!-- Enlace con slug -->
+                            <a href="{{ url_for('property_detail', property_id=property[0], slug=property[1]|slugify) }}"
+                               class="text-decoration-none text-dark">
                                 {% if property[14] and property[14].split(',')[0] %}
-                                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + property[14].split(',')[0]) }}" 
+                                    <img src="{{ url_for('static', filename='images/properties/' + property[0]|string + '/' + property[14].split(',')[0]) }}"
                                          class="card-img-top" alt="{{ property[1] }}">
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='images/default_property.png') }}" 
+                                    <img src="{{ url_for('static', filename='images/default_property.png') }}"
                                          class="card-img-top" alt="Imagen no disponible">
                                 {% endif %}
                                 <span class="operation-badge">{{ property[3] }}</span>
@@ -158,7 +160,7 @@
                                     {% else %}
                                         {% set bathrooms_display = bathrooms_float %}
                                     {% endif %}
-                                
+
                                     {% if bathrooms_display == 1 %}
                                         {{ bathrooms_display }} baño
                                     {% else %}
@@ -188,14 +190,14 @@
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    
+
                     <!-- Numbered Page Buttons -->
                     {% for p in range(1, total_pages + 1) %}
                         <li class="page-item {% if p == page %}active{% endif %}">
                             <a class="page-link" href="{{ url_for('properties', page=p, **filters) }}">{{ p }}</a>
                         </li>
                     {% endfor %}
-                    
+
                     <!-- Next Page Button -->
                     <li class="page-item {% if page == total_pages %}disabled{% endif %}">
                         <a class="page-link" href="{{ url_for('properties', page=page+1, **filters) }}" aria-label="Siguiente">
