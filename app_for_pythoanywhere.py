@@ -55,7 +55,7 @@ except Exception as e:
     worksheet = None
 
 ############################
-# Initializing the DB      #
+#  DB PRINCIPAL (props)    #
 ############################
 
 DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
@@ -85,7 +85,67 @@ def init_db():
     conn.commit()
     conn.close()
 
+############################
+# DB PARA UTILIDADES       #
+############################
+
+UTILITIES_DB_PATH = os.path.join(BASE_DIR, 'utilities.db')
+
+def init_utilities_db():
+    """
+    Inicializa la base de datos utilities.db con una tabla 'counters'
+    y un registro para contar visitas ('visit_counter').
+    """
+    conn = sqlite3.connect(UTILITIES_DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS counters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            value INTEGER NOT NULL
+        )
+    ''')
+    # Aseguramos la existencia de 'visit_counter'
+    cursor.execute("SELECT * FROM counters WHERE name = 'visit_counter'")
+    row = cursor.fetchone()
+    if not row:
+        cursor.execute("INSERT INTO counters (name, value) VALUES (?, ?)", ('visit_counter', 0))
+    conn.commit()
+    conn.close()
+
+def increment_visit_counter():
+    """
+    Incrementa en 1 el contador de visitas global.
+    """
+    conn = sqlite3.connect(UTILITIES_DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE counters SET value = value + 1 WHERE name = 'visit_counter'")
+    conn.commit()
+    conn.close()
+
+def get_visit_counter():
+    """
+    Retorna el valor actual del contador de visitas global.
+    """
+    conn = sqlite3.connect(UTILITIES_DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT value FROM counters WHERE name = 'visit_counter'")
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row[0]
+    return 0
+
+############################
+#  Inicializar ambas DBs   #
+############################
+
 init_db()
+init_utilities_db()
+
+############################
+#  Funciones de propiedades#
+############################
 
 def load_properties():
     conn = sqlite3.connect(DATABASE_PATH)
@@ -215,6 +275,8 @@ def load_agents():
 
 @app.route('/')
 def index():
+    # Contar la visita al home
+    increment_visit_counter()
     return render_template('index.html')
 
 @app.route('/agents', endpoint='agents')
@@ -227,6 +289,9 @@ def contact():
 
 @app.route('/properties', methods=['GET'])
 def properties():
+    # Contar visita a la lista de propiedades
+    increment_visit_counter()
+
     operation = request.args.get('operation')
     property_type = request.args.get('type')
     min_price = request.args.get('min_price')
@@ -312,6 +377,9 @@ def slugify_filter(s):
 
 @app.route('/property/<int:property_id>/<slug>')
 def property_detail(property_id, slug):
+    # Contar visita a página de detalle
+    increment_visit_counter()
+
     property_data = get_property_by_id(property_id)
     if not property_data:
         flash('Propiedad no encontrada.', 'danger')
@@ -435,10 +503,14 @@ def admin_required(func):
 @admin_required
 def admin_properties():
     properties = load_properties()
+
+    # Obtenemos el número de visitas desde utilities.db
+    visit_count = get_visit_counter()
+
     if session.get('welcome_message'):
         flash('Bienvenido al panel de administración.', 'info')
         session.pop('welcome_message')
-    return render_template('admin_properties.html', properties=properties)
+    return render_template('admin_properties.html', properties=properties, visit_count=visit_count)
 
 @app.route('/admin/properties/add', methods=['GET', 'POST'])
 @admin_required
