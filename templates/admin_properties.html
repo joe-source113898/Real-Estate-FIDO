@@ -9,10 +9,16 @@
         <a href="{{ url_for('logout') }}" class="btn btn-secondary">Cerrar Sesión</a>
     </div>
 
+    <!-- Mostrar el contador de visitas en un alert -->
+    <div class="alert alert-info" role="alert">
+        Visitas totales a la página: <strong>{{ visit_count }}</strong>
+    </div>
+
     <div class="mb-3 d-flex justify-content-between align-items-center">
         <div>
             <a href="{{ url_for('add_property') }}" class="btn btn-primary">Añadir Propiedad</a>
-            <form action="{{ url_for('delete_all_properties') }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar todas las propiedades? Esta acción no se puede deshacer.');">
+            <form action="{{ url_for('delete_all_properties') }}" method="post" style="display:inline;"
+                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar todas las propiedades? Esta acción no se puede deshacer.');">
                 <button type="submit" class="btn btn-danger">Eliminar Todas las Propiedades</button>
             </form>
         </div>
@@ -43,7 +49,10 @@
                 <td>
                     <form action="{{ url_for('toggle_status', property_id=property[0]) }}" method="post">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="statusCheck{{ property[0] }}" onchange="this.form.submit()" {% if property[13] == 'En pausa' %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   id="statusCheck{{ property[0] }}"
+                                   onchange="this.form.submit()"
+                                   {% if property[13] == 'En pausa' %}checked{% endif %}>
                             <label class="form-check-label" for="statusCheck{{ property[0] }}">
                                 {% if property[13] == 'En pausa' %}
                                     En pausa
@@ -55,8 +64,11 @@
                     </form>
                 </td>
                 <td>
-                    <a href="{{ url_for('edit_property', property_id=property[0]) }}" class="btn btn-sm btn-warning">Editar</a>
-                    <form action="{{ url_for('delete_property', property_id=property[0]) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer.');">
+                    <a href="{{ url_for('edit_property', property_id=property[0]) }}"
+                       class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ url_for('delete_property', property_id=property[0]) }}"
+                          method="post" style="display:inline;"
+                          onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer.');">
                         <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                     </form>
                 </td>
